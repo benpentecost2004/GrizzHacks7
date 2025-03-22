@@ -3,7 +3,8 @@ from flask import Flask, render_template, jsonify, request
 from datetime import datetime, timedelta
 import traceback
 from methods.add_remove_braincoins import add_remove_braincoins_to_user
-from methods.user_login import login_user, get_user_id
+from methods.questions import add_study_question, complete_q, retrieve_questions_by_user
+from methods.user_login import login_user, get_user_id, user_register
 
 
 template_dir = os.path.abspath("frontend/JobManagement")
@@ -29,5 +30,23 @@ def add_coints():
 @app.route('/remove_coins', methods=['POST'])
 def remove_coints():
     return add_remove_braincoins_to_user(request, "remove")
+
+@app.route('/register', methods=['POST'])
+def register():
+    return user_register(request)
+
+@app.route('/store_question', methods=['POST'])
+def store_q():
+    return add_study_question(request)
+
+@app.route('/complete_question', methods=['POST'])
+def complete_question():
+    return complete_q(request)
+
+@app.route('/get_question_by_user', methods=['GET'])
+def get_qs_by_user():
+    return retrieve_questions_by_user(request)
+
 if __name__ == '__main__':
     app.run(debug=True)
+

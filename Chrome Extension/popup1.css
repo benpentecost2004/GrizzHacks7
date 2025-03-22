@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Courier New", Courier, monospace;
+  text-decoration: none;
+  font-size: 25px;
+}
+
+body {
+  background-color: rgba(0, 0, 0, 0);
+  /* height: 600px; */
+  width: 800px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+body > * {
+  margin: 10px;
+}
+
+.topbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.topbar .left {
+  display: flex;
+  flex-direction: row;
+}
+
+.topbar .right {
+  display: flex;
+  flex-direction: row;
+}
+
+.topbar .right > * {
+  margin: 0 10px;
+}
+
+.time-amount,
+.coin-amount,
+.min {
+  height: 33px;
+  text-align: center;
+  line-height: 33px;
+  vertical-align: center;
+}
+
+.brain-coin,
+.time-left {
+  display: flex;
+  flex-direction: row;
+  margin-right: 0px;
+  height: 33px;
+  margin: auto 0;
+}
+
+.brain-coin-icon {
+  margin-left: 0px;
+}
+
+.brain-coin-icon {
+  text-align: center;
+  line-height: 20px;
+  margin: auto 0;
+  font-weight: bold;
+  font-size: 10px;
+  background-color: gold;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border-width: 10;
+  border-style: solid;
+  border-color: black;
+}
+
+.profile {
+  text-align: center;
+  line-height: 33px;
+  font-weight: bold;
+  font-size: 15px;
+  background-color: gold;
+  height: 33px;
+  width: 33px;
+  border-radius: 50%;
+  border-width: 10;
+  border-style: solid;
+  border-color: black;
+}
+
+.profile i {
+  line-height: 33px;
+  font-size: 25px;
+
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.answers {
+  display: flex;
+  flex: column;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.buy:hover,
+.profile:hover,
+.visit-website:hover,
+.next:hover {
+  cursor: pointer;
+}

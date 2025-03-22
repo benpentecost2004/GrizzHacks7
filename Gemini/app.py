@@ -1,11 +1,10 @@
 import google.generativeai as genai
 import fitz, json, os
-
 from PIL import Image
 from apikey import apikey
 
-genai.configure(api_key=apikey)  
-model = genai.GenerativeModel('gemini-1.5-flash')  
+genai.configure(api_key=apikey)
+model = genai.GenerativeModel('gemini-2.0-flash')
 
 def extract_pdf(file_path):
     """Extract text from a PDF file."""
@@ -38,18 +37,18 @@ def load_existing_responses(file_name):
             with open(file_name, "r", encoding="utf-8") as json_file:
                 return json.load(json_file)
         except json.JSONDecodeError:
-            return {} 
+            return {}
     return {}
 
 def save_responses(file_name, responses):
     """Save responses to a JSON file."""
     with open(file_name, "w", encoding="utf-8") as json_file:
-        json.dump(responses, json_file, indent=4)
+        json.dump(responses, json_file, indent=4, ensure_ascii=False)
 
 def process_files(file_paths, prompt_text):
-    """Process multiple files and generate AI responses."""
-    responses = load_existing_responses("response.json")  
-    answers = load_existing_responses("answers.json") 
+    """Process multiple files and generate AI responses with LaTeX formatting."""
+    responses = load_existing_responses("response.json")
+    answers = load_existing_responses("answers.json")
 
     for file_path in file_paths:
         try:
@@ -66,11 +65,19 @@ def process_files(file_paths, prompt_text):
                     continue
                 contents = [prompt_text, file_content]
 
-            response = model.generate_content(contents)
+            latex_prompt = (
+                "Format all mathematical content using LaTeX syntax. "
+                "Use '$$' for block equations and '$' for inline equations. "
+                "Generate the exact questions in the images with no solutions. "
+                "Also, create a set of similar but unique problems."
+            )
+
+            response = model.generate_content([latex_prompt] + contents)
             response_text = response.text
+
             responses[file_path] = response_text.split("\n")
 
-            answer_prompt = f"Provide answers to the following problems: {response_text}"
+            answer_prompt = f"Provide detailed solutions in LaTeX format for the following problems:\n{response_text}"
             answer_response = model.generate_content([answer_prompt])
             answer_text = answer_response.text
             answers[file_path] = answer_text.split("\n")
@@ -84,11 +91,11 @@ def process_files(file_paths, prompt_text):
 
     save_responses("response.json", responses)
     save_responses("answers.json", answers)
-    print("Responses and answers saved.")
+    print("Responses and answers saved with LaTeX formatting.")
 
 def generate_response(file_paths, prompt_text):
     if isinstance(file_paths, str):
-        file_paths = [file_paths]  
+        file_paths = [file_paths]
     process_files(file_paths, prompt_text)
 
 file_paths = ['calc2.jpg', 'calc.jpeg']

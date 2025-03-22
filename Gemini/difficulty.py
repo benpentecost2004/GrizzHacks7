@@ -14,7 +14,7 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
     response_data = None
 
 if response_data:
-    prompt = f"Generate a difficulty rating on a scale of 1-10 for each response question in this data. Whenever you read a number followed by a colon, that is a new problem that has to be rated. Output each rating on a new line without commas: {json.dumps(response_data)}"
+    prompt = f"Generate a difficulty rating on a scale of 1-10 for each response question in this data. Base your rating off of general concept difficulty. Whenever you read a number followed by a colon, that is a new problem that has to be rated. Output each rating on a new line without commas: {json.dumps(response_data)}"
     response = model.generate_content(prompt)
     
     difficulty_ratings = response.text.strip().split("\n")  # Split into separate lines

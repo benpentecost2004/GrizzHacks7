@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Brain Rot Blocker",
+  "version": "1.0",
+  "description": "Blurs YouTube when opened plus popup.",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "css": ["main-page.css"]
+    }
+  ],
+  "permissions": ["scripting"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

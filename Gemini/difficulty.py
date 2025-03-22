@@ -1,10 +1,42 @@
 import google.generativeai as genai
 import json
+import re
 
 from apikey import apikey
-genai.configure(api_key=apikey)  
-model = genai.GenerativeModel('gemini-1.5-flash')
+
+genai.configure(api_key=apikey)
+model = genai.GenerativeModel('gemini-2.0-flash')
 response_filename = 'response.json'
+
+def extract_problems_from_latex(response_data):
+    """
+    Extracts individual math problems from LaTeX-formatted responses.
+    Looks for numbered problems (e.g., "1: ..." or "Problem 1: ..."),
+    as well as standalone LaTeX equations that could be problems.
+    """
+    problems = []
+    problem_number = 1 
+
+    for file, contents in response_data.items():
+        text = "\n".join(contents) 
+
+        numbered_problems = re.findall(r'(\d+: .*?)(?=\n\d+: |\Z)', text, re.DOTALL)
+
+        if numbered_problems:
+            problems.extend(numbered_problems)
+        else:
+            latex_blocks = re.findall(r'\$\$.*?\$\$', text, re.DOTALL) 
+            inline_latex = re.findall(r'\$.*?\$', text)
+
+            if not latex_blocks and not inline_latex:
+                potential_problems = text.split("\n")
+                problems.extend(potential_problems)
+            else:
+                problems.extend(latex_blocks + inline_latex)
+
+    problems = [p.strip() for p in problems if p.strip()]
+    
+    return problems
 
 try:
     with open(response_filename, "r", encoding="utf-8") as json_file:
@@ -14,11 +46,19 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
     response_data = None
 
 if response_data:
-    prompt = f"Generate a difficulty rating on a scale of 1-10 for each response question in this data. Base your rating off of general concept difficulty. Whenever you read a number followed by a colon, that is a new problem that has to be rated. Output each rating on a new line without commas: {json.dumps(response_data)}"
+    problems = extract_problems_from_latex(response_data)
+
+    prompt = (
+        "Rate the difficulty of each of the following problems on a scale of 1-10. "
+        "The problems may include LaTeX math expressions. Assign a rating for each one separately. "
+        "Format your output with each rating on a new line without commas:\n\n"
+    )
+    prompt += "\n".join(problems)
+
     response = model.generate_content(prompt)
     
-    difficulty_ratings = response.text.strip().split("\n")  # Split into separate lines
-    difficulty_ratings = [rating.strip() for rating in difficulty_ratings if rating.strip()]  # Clean spaces
+    difficulty_ratings = response.text.strip().split("\n") 
+    difficulty_ratings = [rating.strip() for rating in difficulty_ratings if rating.strip()]
 
     json_filename = 'difficulty.json'
 
@@ -34,7 +74,7 @@ if response_data:
     data.append(new_entry)
 
     with open(json_filename, "w", encoding="utf-8") as json_file:
-        json.dump(data, json_file, indent=4)
+        json.dump(data, json_file, indent=4, ensure_ascii=False)
 
     print(f"Difficulty ratings appended to {json_filename}")
 else:

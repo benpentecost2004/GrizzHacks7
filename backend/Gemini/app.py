@@ -1,5 +1,6 @@
 import google.generativeai as genai
 import fitz, json, os
+import requests
 from PIL import Image
 from Gemini.apikey import apikey
 
@@ -93,11 +94,10 @@ def process_files(file_paths, prompt_text):
     return responses
 
 def generate_response(file_paths, prompt_text):
-    if isinstance(file_paths, str):
-        file_paths = [file_paths]
-    responses = process_files(file_paths, prompt_text)
-    return responses
+    print("file_paths:", file_paths)
+    print("prompt_text:", prompt_text)
 
-file_paths = ['calc2.jpg', 'calc.jpeg']
-prompt_text = "Generate the exact questions in the images with no solutions. Also, create a set of similar but unique problems."
-generate_response('C:/Users/alexm/OneDrive/Documents/GitHub/GrizzHacks7/backend/Gemini/calc2.jpg', prompt_text)
+    response = model.generate_content(extract_pdf(file_paths) + prompt_text)
+    print(response.text)
+    return response.text
+

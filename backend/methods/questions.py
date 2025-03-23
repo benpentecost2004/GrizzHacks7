@@ -18,12 +18,61 @@ from Gemini.app import generate_response, load_existing_responses
         "",
 """
 
+def add_study_set(data):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        print("hello from add study set")
+        print(data)
+        user_id = 2  # get_user_id(request) 
+        difficulty = data.get("difficulty", 10)
+        subject = data.get("subject", "General")  # Assuming a default subject if not provided
+        tokens_for_completion = 0
+        true_dif = difficulty
+        # Ensure difficulty is within the range [1, 10]
+        if difficulty < 1 or difficulty > 10:
+            return jsonify({"message": "Difficulty must be between 1 and 10!"}), 400
+
+        while difficulty >= 1:
+            tokens_for_completion += 10 
+            difficulty -= 1
+
+        question = data.get("question")
+
+        if not question:
+            return jsonify({"message": "Question content is required!"}), 400
+
+        query = """
+            INSERT INTO study_qs (user_id, difficulty, tokens_for_completion, question, question_complete, subject) 
+            VALUES (%s, %s, %s, %s, FALSE, %s) RETURNING id
+        """
+
+        cur.execute(query, (user_id, true_dif, tokens_for_completion, question, subject))
+        question_id = cur.fetchone()[0]  # Get the inserted question ID
+
+        conn.commit()
+
+        return jsonify({"message": "Study question added successfully!", "question_id": question_id}), 201
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cur.close()
+        conn.close()
+
+
 def add_study_question(request):
     conn = get_db_connection()
     cur = conn.cursor()
 
     try:
+        print("hello from add study questions")
         data = request.get_json()
+
+        print(data)
         user_id = 2  # get_user_id(request) 
         difficulty = data.get("difficulty", 10)
         subject = data.get("subject", "General")  # Assuming a default subject if not provided
@@ -154,18 +203,19 @@ def get_gem_qs(request):
             file.save(file_path)
 
         # Process the file and generate questions
-        prompt_text = "Generate the exact questions in the file with no solutions. Also, create a set of similar but unique problems."
-        responses = generate_response(file_path, prompt_text)
+        prompt_text = "Generate the exact questions in the file with no solutions. Also, create a set of similar but unique problems. Format the questions and answers in json"
+
+        questions = generate_response(file_path, prompt_text)
 
         # Create the data object
         data = {
-            'responses': responses,   # Set responses from the generated response
+            'question': questions,
             'difficulty': 5,          # Set difficulty level to 5
             'subject': subject        # Set subject from the request
         }
 
         # Add study question
-        add_study_question(data)
+        add_study_set(data)
 
         # Return success message
         return jsonify({'message': 'File processed successfully!'}), 200

@@ -8,7 +8,19 @@ steps to get extension
    4-1. select the folder with the manifest.json and the other included files
 
 
-option 1 for popup
+
+option 1 for popup (use this method)
+1. add to manifest.json
+"background": {
+    "service_worker": "background.js"
+  },
+
+2. rename files in background.js to
+files: ["content2.js"],
+
+
+
+option 2 for popup (this methods doesn't work anymore)
 1. add to "content_scripts": in manifest.json:
 ,
 "default_popup": "popup1.html"
@@ -17,13 +29,3 @@ option 1 for popup
 "background": {
     "service_worker": "background.js"
   },
-
-
-option 2 for popup
-1. add to manifest.json
-"background": {
-    "service_worker": "background.js"
-  },
-
-2. rename files in background.js to
-files: ["content2.js"],

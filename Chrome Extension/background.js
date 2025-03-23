@@ -1,19 +1,8 @@
+// i.e. all in JS not ported to an HTML file
+// directly from the repo from the iamOmarFaruk
+// Background script for Hello World Extension
 
-// stuff for content2.js
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (request.action === "getPopupHtml") {
-//     fetch(chrome.runtime.getURL("popup.html"))
-//       .then((response) => response.text())
-//       .then((html) => {
-//         sendResponse({ html: html });
-//       })
-//       .catch((err) => {
-//         sendResponse({ error: err.message });
-//       });
-//     return true; // Keep the message channel open until sendResponse is called
-//   }
-// });
-
+// Listen for the extension icon to be clicked
 chrome.action.onClicked.addListener((tab) => {
   // Get the current tab ID
   const tabId = tab.id;
@@ -21,7 +10,7 @@ chrome.action.onClicked.addListener((tab) => {
   // Inject the content script into the current tab
   chrome.scripting.executeScript({
     target: { tabId: tabId },
-    files: ["content1.js"],
+    files: ["content2.js"],
     world: "MAIN",
   });
 

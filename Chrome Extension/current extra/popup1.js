@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Check if user has enough aura
     if (auraAmount < 100) {
-      alert("Not enough aura! You need 100 aura, but have " + auraAmount);
+      console.log("Not enough aura! You need 100 aura, but have " + auraAmount);
       return;
     }
     
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }, 100);
     } catch (error) {
       console.error("Error:", error);
-      alert("Error purchasing time. Please try again.");
+      // Error logged to console instead of alert
     }
   }
 

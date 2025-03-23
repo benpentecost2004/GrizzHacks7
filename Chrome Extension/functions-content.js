@@ -63,6 +63,10 @@ export async function showPopup() {
   
   // Fetch coins from API
   await fetchCoinsFromAPI();
+  
+  // Get current time remaining
+  const currentTime = parseInt(localStorage.getItem("secondsLeft")) || 0;
+  const minutesLeft = Math.ceil(currentTime / 60);
 
   // Layout containing styles and HTML template for the popup
   const layout = {
@@ -221,6 +225,7 @@ export async function showPopup() {
   brbBody.style.maxWidth = "500px";
   brbBody.style.backgroundColor = "hsl(222.2 84% 4.9%)"; // Dark background from theme
   brbBody.style.color = "hsl(210 40% 98%)"; // White text from theme
+  brbBody.style.position = "relative"; // For absolute positioning of close button
 
   // Create the top bar
   const topbar = document.createElement("div");
@@ -385,14 +390,14 @@ export async function showPopup() {
           auraAmountElement.textContent = BrainAuraAmount;
         }
         
-        // Show confirmation
-        alert("Successfully purchased 1 minute of time!");
+        // Purchase successful (no alert)
+        console.log("Successfully purchased 1 minute of time!");
       } else {
-        alert("Not enough aura to make this purchase! You need 100 aura, but have " + BrainAuraAmount);
+        console.log("Not enough aura to make this purchase! You need 100 aura, but have " + BrainAuraAmount);
       }
     } catch (error) {
       console.error("Error purchasing time:", error);
-      alert("Error purchasing time. Please try again later.");
+      // Error logged to console instead of alert
     }
   };
   buyButton.onmouseover = function() {
@@ -474,6 +479,56 @@ export async function showPopup() {
   
   main.appendChild(mainVisitLink);
 
+  // Create close button (only visible if time > 0)
+  if (minutesLeft > 0) {
+    const closeButtonContainer = document.createElement("div");
+    closeButtonContainer.style.position = "absolute";
+    closeButtonContainer.style.top = "10px";
+    closeButtonContainer.style.right = "10px";
+    
+    // Create close button
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "✕";
+    closeButton.style.backgroundColor = "transparent";
+    closeButton.style.border = "none";
+    closeButton.style.color = "hsl(210 40% 98%)";
+    closeButton.style.fontSize = "24px";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.padding = "5px 10px";
+    closeButton.style.borderRadius = "5px";
+    closeButton.title = "Close popup and continue watching";
+    
+    // Add hover effect
+    closeButton.onmouseover = function() {
+      this.style.backgroundColor = "hsla(217.2 91.2% 59.8%, 0.2)";
+    };
+    closeButton.onmouseout = function() {
+      this.style.backgroundColor = "transparent";
+    };
+    
+    // Add click handler to remove popup and blur
+    closeButton.onclick = function() {
+      const popup = document.getElementById("logo-popup");
+      if (popup) {
+        popup.remove();
+        
+        // Remove blur from body elements
+        const styleTag = document.createElement('style');
+        styleTag.textContent = 'body > * { filter: blur(0px) !important; }';
+        document.head.appendChild(styleTag);
+        
+        // Resume video if it exists
+        const video = document.querySelector('video');
+        if (video) {
+          video.play().catch(e => console.error("Error playing video:", e));
+        }
+      }
+    };
+    
+    closeButtonContainer.appendChild(closeButton);
+    brbBody.appendChild(closeButtonContainer);
+  }
+  
   // Add elements to popup
   brbBody.appendChild(topbar);
   brbBody.appendChild(main);

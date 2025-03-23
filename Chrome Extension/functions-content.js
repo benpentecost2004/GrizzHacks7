@@ -1,5 +1,5 @@
 // variables
-let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
+let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 0; // 0min
 let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
 let BrainAuraAmount = parseInt(localStorage.getItem("AuraAmount")) || 0;
 let video = document.querySelector("video");

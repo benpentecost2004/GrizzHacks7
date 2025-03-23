@@ -1,6 +1,6 @@
 function mainFunction() {
   // variables
-  let diddyCoins = parseInt(localStorage.getItem("diddyCoins")) || 20; // Default to 20 minutes
+  let diddyCoins = parseInt(localStorage.getItem("diddyCoins")) || 0; // Default to 0 minutes
   let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
   let BrainAuraAmount =
     parseInt(localStorage.getItem("AuraAmount")) || 0; // Default to 0

@@ -129,7 +129,8 @@ def get_gem_qs(request):
         return jsonify({'error': 'No file part in the request'}), 400
 
     file = request.files['file']
-    
+    subject = request.form.get('subject')  # Assuming subject comes from form data or as part of the request
+
     # Check if the file has no filename
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -154,8 +155,19 @@ def get_gem_qs(request):
 
         # Process the file and generate questions
         prompt_text = "Generate the exact questions in the file with no solutions. Also, create a set of similar but unique problems."
-        generate_response(file_path, prompt_text)
+        responses = generate_response(file_path, prompt_text)
 
+        # Create the data object
+        data = {
+            'responses': responses,   # Set responses from the generated response
+            'difficulty': 5,          # Set difficulty level to 5
+            'subject': subject        # Set subject from the request
+        }
+
+        # Add study question
+        add_study_question(data)
+
+        # Return success message
         return jsonify({'message': 'File processed successfully!'}), 200
 
     except Exception as e:

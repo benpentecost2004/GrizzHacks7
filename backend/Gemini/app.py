@@ -1,9 +1,8 @@
 import google.generativeai as genai
-import fitz
-import json
-import os
+import fitz, json, os
+import requests
 from PIL import Image
-from apikey import apikey
+from Gemini.apikey import apikey
 
 genai.configure(api_key=apikey)
 model = genai.GenerativeModel('gemini-2.0-flash')
@@ -91,15 +90,14 @@ def process_files(file_paths, prompt_text):
             responses[file_path] = f"An error occurred: {str(e)}"
             answers[file_path] = f"Error generating answer: {str(e)}"
 
-    save_responses("response.json", responses)
-    save_responses("answers.json", answers)
     print("Responses and answers saved with LaTeX formatting.")
+    return responses
 
 def generate_response(file_paths, prompt_text):
-    if isinstance(file_paths, str):
-        file_paths = [file_paths]
-    process_files(file_paths, prompt_text)
+    print("file_paths:", file_paths)
+    print("prompt_text:", prompt_text)
 
-file_paths = ['calc2.jpg', 'calc.jpeg']
-prompt_text = "Generate the exact questions in the images with no solutions. Also, create a set of similar but unique problems."
-generate_response(file_paths, prompt_text)
+    response = model.generate_content(extract_pdf(file_paths) + prompt_text)
+    print(response.text)
+    return response.text
+

@@ -3,8 +3,8 @@ from flask import Flask, render_template, jsonify, request
 from datetime import datetime, timedelta
 import traceback
 from flask_cors import CORS
-from methods.add_remove_braincoins import add_remove_braincoins_to_user
-from methods.questions import add_study_question, complete_q, retrieve_questions_by_user, get_subs_by_user
+from methods.add_remove_braincoins import *
+from methods.questions import *
 from methods.user_login import login_user, get_user_id, user_register
 
 
@@ -27,12 +27,16 @@ def get_user():
     return get_user_id(request)
 
 @app.route('/add_coins', methods=['POST'])
-def add_coints():
+def add_coins():
     return add_remove_braincoins_to_user(request, "add")
 
 @app.route('/remove_coins', methods=['POST'])
-def remove_coints():
+def remove_coins():
     return add_remove_braincoins_to_user(request, "remove")
+
+@app.route('/get_coins', methods=['GET'])
+def remove_coints():
+    return get_user_coins(request)
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -54,6 +58,17 @@ def get_qs_by_user():
 def get_subjects_by_user():
     return get_subs_by_user(request)
 
+@app.route('/file_to_gemini', methods=['POST'])
+def get_gemini_qs():
+    return get_gem_qs(request)
+
+@app.route('/check_answer', methods=['POST'])
+def check_answer():
+    return answer_check(request)
+
+@app.route('/question_by_sub', methods=['POST'])
+def question_by_sub():
+    return retrieve_questions_by_subject(request)
 if __name__ == '__main__':
     app.run(debug=True)
 

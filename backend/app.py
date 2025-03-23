@@ -3,7 +3,7 @@ from flask import Flask, render_template, jsonify, request
 from datetime import datetime, timedelta
 import traceback
 from flask_cors import CORS
-from methods.add_remove_braincoins import add_remove_braincoins_to_user
+from methods.add_remove_braincoins import *
 from methods.questions import *
 from methods.user_login import login_user, get_user_id, user_register
 
@@ -33,6 +33,10 @@ def add_coints():
 @app.route('/remove_coins', methods=['POST'])
 def remove_coints():
     return add_remove_braincoins_to_user(request, "remove")
+
+@app.route('/get_coins', methods=['GET'])
+def remove_coints():
+    return get_user_coins(request)
 
 @app.route('/register', methods=['POST'])
 def register():

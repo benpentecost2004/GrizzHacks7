@@ -42,3 +42,16 @@ def add_remove_braincoins_to_user(request, action):
         # Close the cursor and connection
         cur.close()
         conn.close()
+
+def get_user_coins(request):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    user_id = 2 # get_user_id(request)
+    query = "SELECT brain_coins FROM users WHERE user_id = %s;"
+    cursor.execute(query, (user_id,))
+    
+    coins = cursor.fetchone()  
+    cursor.close()
+    conn.close()
+    
+    return coins

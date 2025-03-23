@@ -54,6 +54,9 @@ def get_qs_by_user():
 def get_subjects_by_user():
     return get_subs_by_user(request)
 
+@app.route('/file_to_gemini', methods=['POST'])
+def get_subjects_by_user():
+    return get_subs_by_user(request)
 if __name__ == '__main__':
     app.run(debug=True)
 

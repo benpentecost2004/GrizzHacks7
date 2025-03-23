@@ -100,4 +100,4 @@ def generate_response(file_paths, prompt_text):
 
 file_paths = ['calc2.jpg', 'calc.jpeg']
 prompt_text = "Generate the exact questions in the images with no solutions. Also, create a set of similar but unique problems."
-generate_response(file_paths, prompt_text)
+generate_response('C:/Users/alexm/OneDrive/Documents/GitHub/GrizzHacks7/backend/Gemini/calc2.jpg', prompt_text)

@@ -3,7 +3,10 @@ from db import get_db_connection
 from methods.user_login import get_user_id
 from flask import jsonify, request
 from psycopg2.extras import RealDictCursor
-
+import tempfile
+import json
+import os
+from Gemini.app import generate_response, load_existing_responses
 # store based on class 
 """
 "11. Place each sequence in its classification region in the "Happy Land of Sequences" diagram. (\u03b3 is Euler's constant, f<sub>n</sub> is the Fibonacci sequence, and g<sub>n</sub> is the golden ratio sequence.)",
@@ -118,3 +121,47 @@ def get_subs_by_user(request):
     conn.close()
 
     return subjects
+
+
+import tempfile
+from flask import jsonify
+
+def get_gem_qs(request):
+    # Check if a file is part of the request
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+
+    file = request.files['file']
+    
+    # Check if the file has no filename
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    # Ensure the file is a PDF, JPG, or JPEG
+    if not (file.filename.endswith('.pdf') or file.filename.endswith('.jpg') or file.filename.endswith('.jpeg')):
+        return jsonify({'error': 'File type not supported'}), 400
+
+    # Set the suffix based on the file extension
+    if file.filename.endswith('.pdf'):
+        suffix = ".pdf"
+    elif file.filename.endswith('.jpg'):
+        suffix = ".jpg"
+    elif file.filename.endswith('.jpeg'):
+        suffix = ".jpeg"
+
+    try:
+        # Save the uploaded file temporarily with the appropriate suffix
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
+            file_path = temp_file.name
+            file.save(file_path)
+
+        # Process the file and generate questions
+        prompt_text = "Generate the exact questions in the file with no solutions. Also, create a set of similar but unique problems."
+        generate_response(file_path, prompt_text)
+
+        return jsonify({'message': 'File processed successfully!'}), 200
+
+    except Exception as e:
+        return jsonify({'error': f'Error processing file: {str(e)}'}), 500
+
+

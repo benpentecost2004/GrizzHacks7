@@ -47,11 +47,14 @@ def get_user_coins(request):
     conn = get_db_connection()
     cursor = conn.cursor()
     user_id = 2 # get_user_id(request)
-    query = "SELECT brain_coins FROM users WHERE user_id = %s;"
+    query = "SELECT brain_coins FROM users WHERE id = %s;"
     cursor.execute(query, (user_id,))
     
-    coins = cursor.fetchone()  
+    result = cursor.fetchone()
     cursor.close()
     conn.close()
     
-    return coins
+    if result:
+        return jsonify({"brain_coins": result[0]}), 200
+    else:
+        return jsonify({"error": "User not found"}), 404

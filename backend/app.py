@@ -12,7 +12,8 @@ template_dir = os.path.abspath("frontend/JobManagement")
 
 app = Flask(__name__, template_folder=template_dir)
 
-CORS(app)
+# Allow requests from your Vercel domain
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def home():
@@ -27,7 +28,7 @@ def get_user():
     return get_user_id(request)
 
 @app.route('/add_coins', methods=['POST'])
-def add_coints():
+def add_coins():
     return add_remove_braincoins_to_user(request, "add")
 
 @app.route('/remove_coins', methods=['POST'])
@@ -35,7 +36,7 @@ def remove_coints():
     return add_remove_braincoins_to_user(request, "remove")
 
 @app.route('/get_coins', methods=['GET'])
-def remove_coints():
+def get_coins():
     return get_user_coins(request)
 
 @app.route('/register', methods=['POST'])
@@ -70,5 +71,5 @@ def check_answer():
 def question_by_sub():
     return retrieve_questions_by_subject(request)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 

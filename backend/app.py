@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import traceback
 from flask_cors import CORS
 from methods.add_remove_braincoins import add_remove_braincoins_to_user
-from methods.questions import add_study_question, complete_q, retrieve_questions_by_user, get_subs_by_user
+from methods.questions import *
 from methods.user_login import login_user, get_user_id, user_register
 
 
@@ -55,8 +55,8 @@ def get_subjects_by_user():
     return get_subs_by_user(request)
 
 @app.route('/file_to_gemini', methods=['POST'])
-def get_subjects_by_user():
-    return get_subs_by_user(request)
+def get_gemini_qs():
+    return get_gem_qs(request)
 if __name__ == '__main__':
     app.run(debug=True)
 

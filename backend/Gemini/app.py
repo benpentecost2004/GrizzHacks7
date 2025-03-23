@@ -1,7 +1,7 @@
 import google.generativeai as genai
 import fitz, json, os
 from PIL import Image
-from apikey import apikey
+from Gemini.apikey import apikey
 
 genai.configure(api_key=apikey)
 model = genai.GenerativeModel('gemini-2.0-flash')

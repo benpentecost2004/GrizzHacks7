@@ -123,9 +123,6 @@ def get_subs_by_user(request):
     return subjects
 
 
-import tempfile
-from flask import jsonify
-
 def get_gem_qs(request):
     # Check if a file is part of the request
     if 'file' not in request.files:

@@ -2,14 +2,17 @@ import os
 from flask import Flask, render_template, jsonify, request
 from datetime import datetime, timedelta
 import traceback
+from flask_cors import CORS
 from methods.add_remove_braincoins import add_remove_braincoins_to_user
-from methods.questions import add_study_question, complete_q, retrieve_questions_by_user
+from methods.questions import add_study_question, complete_q, retrieve_questions_by_user, get_subs_by_user
 from methods.user_login import login_user, get_user_id, user_register
 
 
 template_dir = os.path.abspath("frontend/JobManagement")
 
 app = Flask(__name__, template_folder=template_dir)
+
+CORS(app)
 
 @app.route('/')
 def home():
@@ -46,6 +49,10 @@ def complete_question():
 @app.route('/get_question_by_user', methods=['GET'])
 def get_qs_by_user():
     return retrieve_questions_by_user(request)
+
+@app.route('/get_subjects_by_user', methods=['GET'])
+def get_subjects_by_user():
+    return get_subs_by_user(request)
 
 if __name__ == '__main__':
     app.run(debug=True)

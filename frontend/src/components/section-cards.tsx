@@ -1,18 +1,10 @@
-import {
-  IconTrendingDown,
-  IconTrendingUp,
-  IconMoodCheck,
-} from "@tabler/icons-react";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useEffect, useState } from 'react';
+import { IconMoodCheck } from '@tabler/icons-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 function UniqueCard({
   title,
@@ -35,7 +27,6 @@ function UniqueCard({
         <CardAction>
           <Badge variant="outline">
             <IconMoodCheck />
-            Last Test Score: {score}%
           </Badge>
         </CardAction>
       </CardHeader>
@@ -50,32 +41,46 @@ function UniqueCard({
 }
 
 export function SectionCards() {
+  const [titles, setTitles] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchTitles = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/get_subjects_by_user');
+        const data = await response.json();
+
+        // Count occurrences of each subject
+        const frequencyMap: Record<string, number> = {};
+        data.forEach((subject: string) => {
+          frequencyMap[subject] = (frequencyMap[subject] || 0) + 1;
+        });
+
+        // Sort subjects by frequency in descending order
+        const sortedTitles = Object.entries(frequencyMap)
+          .sort((a, b) => b[1] - a[1]) // Sort by frequency
+          .map(([subject]) => subject); // Extract subject names
+
+        // Take the top 4 subjects
+        setTitles(sortedTitles.slice(0, 4));
+      } catch (error) {
+        console.error('Failed to fetch titles:', error);
+      }
+    };
+
+    fetchTitles();
+  }, []);
+
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <UniqueCard
-        title="Philosophy"
-        numTerms={10}
-        lastStudied="April 24, 2024"
-        score={80}
-      />
-      <UniqueCard
-        title="History"
-        numTerms={23}
-        lastStudied="March 4, 2025"
-        score={88}
-      />
-      <UniqueCard
-        title="History"
-        numTerms={23}
-        lastStudied="March 4, 2025"
-        score={88}
-      />
-      <UniqueCard
-        title="History"
-        numTerms={23}
-        lastStudied="March 4, 2025"
-        score={88}
-      />
+    <div className="grid grid-cols-2 gap-4 px-4 lg:px-6">
+      {titles.map((title, index) => (
+        <UniqueCard
+          key={index}
+          title={title}
+          numTerms={10}
+          lastStudied="April 24, 2024"
+          score={80}
+        />
+      ))}
     </div>
   );
 }

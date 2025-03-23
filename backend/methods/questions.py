@@ -100,3 +100,21 @@ def retrieve_questions_by_user(request):
     conn.close()
     
     return questions
+
+def get_subs_by_user(request):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    user_id = 2  # get_user_id(request)
+    query = "SELECT * FROM study_qs WHERE user_id = %s;"
+    cursor.execute(query, (user_id,))
+
+    # Fetch all questions
+    questions = cursor.fetchall()  
+
+    # Extract all subjects from the questions
+    subjects = [question['subject'] for question in questions]
+
+    cursor.close()
+    conn.close()
+
+    return subjects

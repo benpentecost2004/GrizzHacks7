@@ -224,12 +224,22 @@ def get_gem_qs(request):
         return jsonify({'error': f'Error processing file: {str(e)}'}), 500
 
 def answer_check(request):
-    question = request.question
-    answer_input = request.answer
-    prompt = "Check this question to the answer and return True or False on whether it is correct"
-    string = (f"Question: {question} Answer: {answer_input}")
-    response = generate_response(string, prompt)
-    return response.text
+    try:
+        data = request.get_json()  # Extract JSON data
+        question = data.get("question")  # Get question from JSON
+        answer_input = data.get("answer")  # Get answer from JSON
 
+        if not question or not answer_input:
+            return jsonify({"error": "Missing question or answer"}), 400
+
+        prompt = "Check this question to the answer and return True or False on whether it is correct"
+        string = f"Question: {question} Answer: {answer_input}"
+        
+        response = generate_response(string, prompt)
+        
+        return jsonify({"result": response.text})  # Return response in JSON format
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
     

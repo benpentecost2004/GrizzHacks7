@@ -5,7 +5,6 @@
 // } from "functions-content.js";
 
 function mainFunction() {
-  
   // variables
   let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
   let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
@@ -361,6 +360,11 @@ function mainFunction() {
     console.log("Video paused");
     showPopup();
   }
+
+  // debug
+  video.pause();
+  console.log("Video paused");
+  showPopup();
 }
 
 setTimeout(mainFunction, 2000); // Delay of 2000 milliseconds (2 seconds)

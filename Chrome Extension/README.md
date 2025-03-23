@@ -29,11 +29,9 @@ option 2 for popup (this methods doesn't work anymore)
    "service_worker": "background.js"
    },
 
-
-
-
 in the "action":
 "default_popup": "the-popup.html",
+"default_popup": "popup-port.html",
 "default_popup": "popup1.html",
 
 in the main manifest.json

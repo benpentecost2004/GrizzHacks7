@@ -1,16 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Make sure the element is available before trying to access it
   const timeAmountElement = document.getElementById("time-amount");
+  const coinAmountElement = document.getElementById("coin-amount");
 
   if (timeAmountElement) {
-    // Retrieve saved watch time from localStorage (default to 0 if not found)
-    const savedWatchTime = localStorage.getItem("watchedTime") || 0;
 
-    // Calculate the number of minutes from savedWatchTime
-    const minutesWatched = Math.floor(savedWatchTime / 60);
+    let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
+    let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
+    let BrainCoinsAmount =
+      parseInt(localStorage.getItem("BrainCoinsAmount")) || 340;
+    let video = document.querySelector("video");
+    let minutesLeft = Math.ceil(secondsLeft / 60);
+    let minutesWatched = Math.ceil(secondsWatched / 60);
 
-    // Display the calculated minutes in the element with id "time-amount"
     timeAmountElement.textContent = minutesWatched;
+    coinAmountElement.textContent = BrainCoinsAmount;
+
   } else {
     console.error("Element with id 'time-amount' not found.");
   }

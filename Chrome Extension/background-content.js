@@ -5,10 +5,11 @@
 // } from "functions-content.js";
 
 function mainFunction() {
+  
   // variables
   let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
   let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
-  const BrainCoinsAmount =
+  let BrainCoinsAmount =
     parseInt(localStorage.getItem("BrainCoinsAmount")) || 340;
   let video = document.querySelector("video");
   let minutesLeft = Math.ceil(secondsLeft / 60);
@@ -322,22 +323,29 @@ function mainFunction() {
           elapsedSeconds = 1;
         }
         secondsWatched += elapsedSeconds;
+        secondsLeft -= elapsedSeconds;
         timeA = timeB;
-        console.log(`watchTime: ${secondsWatched} seconds`);
+
+        console.log(`secondsLeft: ${secondsLeft} seconds`);
+        console.log(`secondsWatched: ${secondsWatched} seconds`);
+        console.log(`minutesLeft: ${minutesLeft} minutes`);
+        console.log(`minutesWatched: ${minutesWatched} minutes`);
+
         localStorage.setItem("secondsWatched", secondsWatched);
+        localStorage.setItem("secondsLeft", secondsLeft);
       }
     }, 1000);
 
-    // Restore watch time when the page loads
-    window.addEventListener("load", () => {
-      let secondsWatched = localStorage.getItem("secondsWatched");
-      if (secondsWatched) {
-        secondsWatched = parseInt(secondsWatched);
-        console.log(
-          `Restored watchTime from localStorage: ${secondsWatched} seconds`
-        );
-      }
-    });
+    // // Restore watch time when the page loads
+    // window.addEventListener("load", () => {
+    //   let secondsWatched = localStorage.getItem("secondsWatched");
+    //   if (secondsWatched) {
+    //     secondsWatched = parseInt(secondsWatched);
+    //     console.log(
+    //       `Restored watchTime from localStorage: ${secondsWatched} seconds`
+    //     );
+    //   }
+    // });
   }
 
   // log everything just to see

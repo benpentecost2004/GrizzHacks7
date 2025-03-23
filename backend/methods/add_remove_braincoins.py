@@ -4,22 +4,24 @@ from flask import jsonify
 def add_remove_braincoins_to_user(request, action):
     conn = get_db_connection()
     cur = conn.cursor()
-    user_id = 1 # get_user_id(request)
+    data = request.get_json()
+    aura_points = data.get("amount")
+    user_id = 2 # get_user_id(request)
     if action == "remove":
         coin_query = """
             UPDATE users
-            SET brain_coins = brain_coins - 10
+            SET brain_coins = brain_coins - %s
             WHERE id = %s
         """
     else:
         coin_query = """
             UPDATE users
-            SET brain_coins = brain_coins + 10
+            SET brain_coins = brain_coins + %s
             WHERE id = %s
         """
     # Execute the query with the user ID
     try:
-        cur.execute(coin_query, (user_id,))
+        cur.execute(coin_query, (aura_points,user_id))
 
         # Commit the transaction
         conn.commit()

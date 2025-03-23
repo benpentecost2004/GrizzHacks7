@@ -5,12 +5,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const buyButton = document.querySelector(".buy");
   const visitButton = document.querySelector(".visit-website");
 
-  // Load values from localStorage
-  let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200;
+  // Load aura and minutes from localStorage
+  let diddyCoins = parseInt(localStorage.getItem("diddyCoins")) || 0;
   let auraAmount = parseInt(localStorage.getItem("AuraAmount")) || 340;
 
   // Immediately update displays on page load
   updateDisplays();
+
+  // Set up continuous time tracking
+  setupTimeTracker();
 
   // Buy button click handler
   if (buyButton) {
@@ -25,10 +28,32 @@ document.addEventListener("DOMContentLoaded", function () {
       window.open("https://brain-rot-blocker-web-t5i2-git-main-travisboyd884s-projects.vercel.app/dashboard", "_blank");
     };
   }
+  
+  // Setup a timer to continuously check for time and aura changes in localStorage
+  function setupTimeTracker() {
+    console.log("Setting up continuous tracker for time and aura");
+    
+    // Check every 500ms for changes
+    setInterval(() => {
+      const currentStoredDiddyCoins = parseInt(localStorage.getItem("diddyCoins")) || 0;
+      const currentStoredAura = parseInt(localStorage.getItem("AuraAmount")) || 0;
+      
+      // If values have changed in localStorage, update our local variables and display
+      if (currentStoredDiddyCoins !== diddyCoins || currentStoredAura !== auraAmount) {
+        console.log("Diddy coins or aura changed in localStorage:", 
+          diddyCoins, "->", currentStoredDiddyCoins, 
+          auraAmount, "->", currentStoredAura);
+        
+        diddyCoins = currentStoredDiddyCoins;
+        auraAmount = currentStoredAura;
+        updateDisplays();
+      }
+    }, 500);
+  }
 
-  // Function to handle buying time
+  // Function to handle buying more time
   async function handleBuyTime() {
-    console.log("Buy time button clicked");
+    console.log("Buy more time button clicked");
     
     // Check if user has enough aura
     if (auraAmount < 100) {
@@ -58,17 +83,24 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Update values
       auraAmount -= 100;
-      secondsLeft += 60;
+      diddyCoins += 1; // Increment time by 1 minute (each worth 100 aura)
       
       // Save to localStorage
       localStorage.setItem("AuraAmount", auraAmount);
-      localStorage.setItem("secondsLeft", secondsLeft);
+      localStorage.setItem("diddyCoins", diddyCoins);
+      localStorage.removeItem("secondsLeft"); // Remove old time format
       
-      // Force DOM update
+      // Update displays
       updateDisplays();
       
-      // Confirm purchase
-      alert("Successfully purchased 1 minute of time!");
+      // Force the DOM to update and log the current display state
+      console.log("After updateDisplays - timeDisplay:", timeDisplay ? timeDisplay.innerHTML : "not available");
+      console.log("After updateDisplays - time-amount element:", document.getElementById("time-amount").innerHTML);
+      
+      // Add a small delay before closing to ensure the DOM updates are applied and localStorage is written
+      setTimeout(() => {
+        window.close();
+      }, 100);
     } catch (error) {
       console.error("Error:", error);
       alert("Error purchasing time. Please try again.");
@@ -77,22 +109,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to update displays
   function updateDisplays() {
-    console.log("Updating displays with: secondsLeft =", secondsLeft, "auraAmount =", auraAmount);
-    
-    // Calculate minutes
-    const minutesLeft = Math.ceil(secondsLeft / 60);
+    console.log("Updating displays with: minutes =", diddyCoins, "auraAmount =", auraAmount);
     
     // Update time display using direct DOM manipulation
     if (timeDisplay) {
-      timeDisplay.innerHTML = minutesLeft;
-      console.log("Time display updated to:", minutesLeft);
+      timeDisplay.innerHTML = diddyCoins;
+      console.log("Time display updated to:", diddyCoins);
     } else {
       console.error("Time display element not found");
       // Try direct DOM access as fallback
       const fallbackTimeElement = document.getElementById("time-amount");
       if (fallbackTimeElement) {
-        fallbackTimeElement.innerHTML = minutesLeft;
-        console.log("Fallback time display updated to:", minutesLeft);
+        fallbackTimeElement.innerHTML = diddyCoins;
+        console.log("Fallback time display updated to:", diddyCoins);
       }
     }
     

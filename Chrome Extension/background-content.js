@@ -1,11 +1,10 @@
 function mainFunction() {
   // variables
-  let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
+  let diddyCoins = parseInt(localStorage.getItem("diddyCoins")) || 20; // Default to 20 minutes
   let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
   let BrainAuraAmount =
     parseInt(localStorage.getItem("AuraAmount")) || 0; // Default to 0
   let video = document.querySelector("video");
-  let minutesLeft = Math.ceil(secondsLeft / 60);
   let minutesWatched = Math.ceil(secondsWatched / 60);
 
   async function showPopup() {
@@ -230,12 +229,12 @@ function mainFunction() {
     controls.style.margin = "0 auto";
     controls.style.padding = "10px 0";
 
-    // time left
+    // time display
     const timeLeft = document.createElement("div");
     timeLeft.className = "time-left";
     const timeAmount = document.createElement("p");
     timeAmount.className = "time-amount";
-    timeAmount.textContent = minutesLeft;
+    timeAmount.textContent = diddyCoins;
     timeAmount.style.fontSize = "24px";
     timeAmount.style.fontWeight = "bold";
     timeAmount.style.color = "hsl(210 40% 98%)"; // White text
@@ -305,17 +304,23 @@ function mainFunction() {
           // Subtract coins
           BrainAuraAmount = Math.max(0, BrainAuraAmount - 100);
           
-          // Add time (1 minute = 60 seconds)
-          secondsLeft += 60;
+          // Add one minute of time
+          diddyCoins += 1;
           
           // Update localStorage
           localStorage.setItem("AuraAmount", BrainAuraAmount);
-          localStorage.setItem("secondsLeft", secondsLeft);
+          localStorage.setItem("diddyCoins", diddyCoins);
           
-          // Update display if element exists
+          // Update displays
           const auraAmountElement = document.querySelector("#aura-display");
           if (auraAmountElement) {
             auraAmountElement.textContent = BrainAuraAmount;
+          }
+          
+          // Update time display
+          const timeAmountElement = document.querySelector(".time-amount");
+          if (timeAmountElement) {
+            timeAmountElement.textContent = diddyCoins;
           }
           
           // Show confirmation
@@ -357,7 +362,7 @@ function mainFunction() {
     auraContainer.style.margin = "0";
     auraContainer.appendChild(brainCoin);
     
-    // Label for time
+    // Label for time remaining
     const timeLabel = document.createElement("p");
     timeLabel.textContent = "Time Remaining:";
     timeLabel.style.fontWeight = "bold";
@@ -427,6 +432,10 @@ function mainFunction() {
     let timeA = video.currentTime;
     console.log(`timeA: ${timeA}`);
     console.log("YouTube video found. Starting watch tracking...");
+    
+    // Track accumulated seconds for diddy coin consumption
+    let accumulatedSeconds = 0;
+    
     setInterval(() => {
       if (!video.paused) {
         let timeB = Math.floor(video.currentTime);
@@ -434,17 +443,26 @@ function mainFunction() {
         if (elapsedSeconds < 0 || 2 < elapsedSeconds) {
           elapsedSeconds = 1;
         }
+        
         secondsWatched += elapsedSeconds;
-        secondsLeft -= elapsedSeconds;
+        accumulatedSeconds += elapsedSeconds;
         timeA = timeB;
+        
+        // Every 60 seconds (1 minute) of watching, consume 1 minute of time
+        if (accumulatedSeconds >= 60) {
+          if (diddyCoins > 0) {
+            diddyCoins -= 1;
+            localStorage.setItem("diddyCoins", diddyCoins);
+          }
+          accumulatedSeconds = 0; // Reset accumulated seconds
+        }
 
-        console.log(`secondsLeft: ${secondsLeft} seconds`);
+        console.log(`minutes remaining: ${diddyCoins}`);
         console.log(`secondsWatched: ${secondsWatched} seconds`);
-        console.log(`minutesLeft: ${minutesLeft} minutes`);
         console.log(`minutesWatched: ${minutesWatched} minutes`);
+        console.log(`accumulatedSeconds: ${accumulatedSeconds}`);
 
         localStorage.setItem("secondsWatched", secondsWatched);
-        localStorage.setItem("secondsLeft", secondsLeft);
       }
     }, 1000);
 
@@ -461,16 +479,15 @@ function mainFunction() {
   }
 
   // log everything just to see
-  console.log(`secondsLeft: ${secondsLeft} seconds`);
+  console.log(`minutes remaining: ${diddyCoins}`);
   console.log(`secondsWatched: ${secondsWatched} seconds`);
-  console.log(`minutesLeft: ${minutesLeft} minutes`);
   console.log(`minutesWatched: ${minutesWatched} minutes`);
 
   trackYouTubeWatchTime();
 
-  if (secondsLeft == 0) {
+  if (diddyCoins == 0) {
     video.pause();
-    console.log("Video paused");
+    console.log("Video paused - out of time");
     showPopup().catch(err => console.error("Error showing popup:", err));
   }
 

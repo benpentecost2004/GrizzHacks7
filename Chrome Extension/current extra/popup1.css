@@ -48,6 +48,11 @@ body > * {
   vertical-align: center;
 }
 
+.time-amount {
+  color: red;
+  font-weight: bold;
+}
+
 .brain-aura,
 .time-left {
   display: flex;
@@ -113,4 +118,20 @@ body > * {
 .visit-website:hover,
 .next:hover {
   cursor: pointer;
+}
+
+/* Visual feedback for successful purchase */
+.purchase-success {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+/* Default style for the buy button if not already defined */
+.buy {
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease;
 }

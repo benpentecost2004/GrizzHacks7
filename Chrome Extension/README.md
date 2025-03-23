@@ -21,11 +21,17 @@ files: ["content2.js"],
 
 
 option 2 for popup (this methods doesn't work anymore)
-1. add to "content_scripts": in manifest.json:
+1. add to "action": in manifest.json:
 ,
 "default_popup": "popup1.html"
 
 2. (optional) delete from manifest.json
 "background": {
     "service_worker": "background.js"
+  },
+
+
+"action": {
+    "default_popup": "the-popup.html",
+    "default_title": "Click me"
   },

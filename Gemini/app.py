@@ -1,5 +1,7 @@
 import google.generativeai as genai
-import fitz, json, os
+import fitz
+import json
+import os
 from PIL import Image
 from apikey import apikey
 

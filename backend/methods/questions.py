@@ -159,7 +159,7 @@ def retrieve_questions_by_subject(request):
     user_id = 2 # get_user_id(request)
     data = request.get_json()
     subject = data.get("subject")
-    query = "SELECT * FROM study_qs WHERE user_id = %s AND WHERE subject = %s;"
+    query = "SELECT * FROM study_qs WHERE user_id = %s AND subject = %s;"
     cursor.execute(query, (user_id,subject,))
     
     questions = cursor.fetchone()  
@@ -217,7 +217,7 @@ def get_gem_qs(request):
             file.save(file_path)
 
         # Process the file and generate questions
-        prompt_text = "Generate the exact questions in the file with no solutions. Also, create a set of similar but unique problems. Format the questions and answers in json"
+        prompt_text = "Generate the exact questions in the file with no solutions. Also, create a set of similar but unique problems. Format the questions and answers in json. The json should be in this formation {original_problems: [problem: "", problem: "", ...], similar_problems: [problem: "", problem: "", ...] } each problem should only contain the problem no solution"
 
         questions = generate_response(file_path, prompt_text)
 

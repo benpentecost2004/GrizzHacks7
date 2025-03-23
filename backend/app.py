@@ -62,6 +62,9 @@ def get_gemini_qs():
 def check_answer():
     return answer_check(request)
 
+@app.route('/question_by_sub', methods=['POST'])
+def question_by_sub():
+    return retrieve_questions_by_subject(request)
 if __name__ == '__main__':
     app.run(debug=True)
 

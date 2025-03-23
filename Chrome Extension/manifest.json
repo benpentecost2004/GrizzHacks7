@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Brain Rot Blocker",
+  "name": "Logo.png",
   "version": "1.0",
   "description": "Blurs YouTube when opened plus popup.",
 
@@ -12,9 +12,11 @@
     }
   ],
   "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["http://127.0.0.1:5000/*"],
   "action": {
     "default_popup": "popup-port.html",
-    "default_title": "Click me"
+    "default_title": "Logo.png",
+    "default_icon": "Logo.png"
   },
   "web_accessible_resources": [
     {
@@ -23,7 +25,9 @@
         "background.js",
         "functions-content.js",
         "popup-content.js",
-        "the-popup.html"
+        "the-popup.html",
+        "Logo.png",
+        "logo-data.js"
       ],
       "matches": ["<all_urls>"]
     }

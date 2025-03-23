@@ -3,14 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Redirecting...</title>
+    <title>Logo.png</title>
     <link
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
     />
-    <!-- Meta refresh method -->
+    <style>
+      body {
+        font-family: "Courier New", Courier, monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        background-color: hsl(222.2 84% 4.9%);
+        color: hsl(210 40% 98%);
+        min-width: 300px;
+      }
+      .logo {
+        max-width: 200px;
+        margin: 10px auto 20px auto;
+      }
+      a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: hsl(221.2 83.2% 53.3%);
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 18px;
+        margin-top: 15px;
+      }
+      a:hover {
+        background-color: hsl(224.3 76.3% 48%);
+      }
+      .bx {
+        margin-left: 5px;
+      }
+    </style>
   </head>
   <body>
+    <img src="Logo.png" alt="Brain Rot Blocker Logo" class="logo">
     <a href="http://localhost:3000"
       >Visit Website <i class="bx bx-link-external"></i
     ></a>

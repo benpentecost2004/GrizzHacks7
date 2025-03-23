@@ -22,7 +22,7 @@ function mainFunction() {
     video.pause();
     console.log("Video paused");
   }
-  showPopup();
+  showPopup().catch(err => console.error("Error showing popup:", err));
 }
 
 setTimeout(mainFunction, 2000); // Delay of 2000 milliseconds (2 seconds)

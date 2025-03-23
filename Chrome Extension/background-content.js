@@ -1,23 +1,34 @@
-// import {
-//   preloadResource,
-//   showPopup,
-//   trackYouTubeWatchTime,
-// } from "functions-content.js";
-
 function mainFunction() {
   // variables
   let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
   let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
   let BrainCoinsAmount =
-    parseInt(localStorage.getItem("BrainCoinsAmount")) || 340;
+    parseInt(localStorage.getItem("CoinsAmount")) || 0; // Default to 0
   let video = document.querySelector("video");
   let minutesLeft = Math.ceil(secondsLeft / 60);
   let minutesWatched = Math.ceil(secondsWatched / 60);
 
-  function showPopup() {
+  async function showPopup() {
     // Check if the popup already exists
-    if (document.getElementById("brain-rot-blocker-popup")) {
+    if (document.getElementById("logo-popup")) {
       return;
+    }
+    
+    // Fetch coins from API
+    try {
+      console.log("Fetching coins from API...");
+      const response = await fetch("http://127.0.0.1:5000/get_coins");
+      if (!response.ok) {
+        throw new Error('Failed to fetch coins');
+      }
+      const data = await response.json();
+      console.log("API response:", data);
+      
+      BrainCoinsAmount = data.brain_coins || 0;
+      console.log("Updated CoinsAmount to:", BrainCoinsAmount);
+      localStorage.setItem("CoinsAmount", BrainCoinsAmount);
+    } catch (error) {
+      console.error('Error fetching coins:', error);
     }
 
     // Layout containing styles and HTML template for the popup
@@ -37,11 +48,11 @@ function mainFunction() {
         filter: blur(20px) !important;
       }
 
-      .brain-rot-blocker-popup {
+      #logo-popup {
         filter: blur(0px) !important;
       }
       
-      .brain-rot-blocker-popup {
+      .logo-popup {
         background-color: rgba(0, 0, 0, 0.5);
         height: 100vh;
         width: 100vw;
@@ -49,7 +60,7 @@ function mainFunction() {
         flex-direction: row;
       }
 
-      .brb-body {
+      .popup-body {
         margin: auto;
         background-color: white;
         width: 80%;
@@ -58,7 +69,7 @@ function mainFunction() {
         flex-direction: column;
       }
 
-      .brb-body > * {
+      .popup-body > * {
         margin: 10px;
       }
 
@@ -91,7 +102,7 @@ function mainFunction() {
         vertical-align: center;
       }
 
-      .brain-coin,
+      .coin,
       .time-left {
         display: flex;
         flex-direction: row;
@@ -100,19 +111,13 @@ function mainFunction() {
         margin: auto 0;
       }
 
-      .brain-coin-icon {
+      .coin-icon {
         text-align: center;
         line-height: 20px;
         margin: auto 0;
-        font-weight: bold;
-        font-size: 10px;
-        background-color: gold;
-        height: 20px;
-        width: 20px;
-        border-radius: 50%;
-        border-width: 10;
-        border-style: solid;
-        border-color: black;
+        font-size: 24px;
+        padding: 0 5px;
+        color: #ff69b4; /* Hot pink */
       }
 
       .profile {
@@ -172,24 +177,58 @@ function mainFunction() {
 
     // Create the popup element using DOM manipulation
     const popup = document.createElement("div");
-    popup.className = "brain-rot-blocker-popup";
-    popup.id = "brain-rot-blocker-popup";
+    popup.className = "logo-popup";
+    popup.id = "logo-popup";
 
     // Create the popup main body element
     const brbBody = document.createElement("div");
-    brbBody.className = "brb-body";
-    brbBody.id = "brb-body";
+    brbBody.className = "popup-body";
+    brbBody.id = "popup-body";
+    brbBody.style.width = "60%";
+    brbBody.style.maxWidth = "500px";
+    brbBody.style.backgroundColor = "hsl(222.2 84% 4.9%)"; // Dark background from theme
+    brbBody.style.color = "hsl(210 40% 98%)"; // White text from theme
 
     // Create the top bar
     const topbar = document.createElement("div");
     topbar.className = "topbar";
-    const left = document.createElement("div");
-    left.className = "left";
-    const h1 = document.createElement("h1");
-    h1.textContent = "Brain Rot Blocker";
-    left.appendChild(h1);
-    const right = document.createElement("div");
-    right.className = "right";
+    topbar.style.display = "flex";
+    topbar.style.flexDirection = "column";
+    topbar.style.alignItems = "center";
+    topbar.style.justifyContent = "center";
+    
+    const title = document.createElement("div");
+    title.className = "title";
+    const logoImg = document.createElement("img");
+    logoImg.src = chrome.runtime.getURL("Logo.png");
+    logoImg.alt = "Logo";
+    logoImg.style.maxWidth = "250px";
+    logoImg.style.height = "auto";
+    logoImg.style.display = "block";
+    logoImg.style.margin = "10px auto 20px auto";
+    
+    // Add error handling for the image
+    logoImg.onerror = function() {
+      console.error("Failed to load logo image");
+      const h1 = document.createElement("h1");
+      h1.textContent = "Logo.png";
+      h1.style.textAlign = "center";
+      h1.style.margin = "10px 0 20px 0";
+      h1.style.color = "hsl(210 40% 98%)"; // White text
+      title.appendChild(h1);
+    };
+    
+    title.appendChild(logoImg);
+    
+    const controls = document.createElement("div");
+    controls.className = "controls";
+    controls.style.display = "flex";
+    controls.style.alignItems = "center";
+    controls.style.justifyContent = "center";
+    controls.style.gap = "20px";
+    controls.style.flexWrap = "wrap";
+    controls.style.margin = "0 auto";
+    controls.style.padding = "10px 0";
 
     // time left
     const timeLeft = document.createElement("div");
@@ -197,108 +236,134 @@ function mainFunction() {
     const timeAmount = document.createElement("p");
     timeAmount.className = "time-amount";
     timeAmount.textContent = minutesLeft;
+    timeAmount.style.fontSize = "24px";
+    timeAmount.style.fontWeight = "bold";
+    timeAmount.style.color = "hsl(210 40% 98%)"; // White text
     const min = document.createElement("p");
     min.className = "min";
     min.textContent = "min";
+    min.style.fontSize = "24px";
+    min.style.fontWeight = "bold";
+    min.style.color = "hsl(210 40% 98%)"; // White text
     timeLeft.appendChild(timeAmount);
     timeLeft.appendChild(min);
 
-    // brain coin
+    // coins
     const brainCoin = document.createElement("div");
-    brainCoin.className = "brain-coin";
+    brainCoin.className = "coin";
     const coinAmount = document.createElement("p");
     coinAmount.className = "coin-amount";
+    coinAmount.id = "coins-display"; // Add ID for easier updating
     coinAmount.textContent = BrainCoinsAmount;
-    const brainCoinIcon = document.createElement("div");
-    brainCoinIcon.className = "brain-coin-icon";
-    brainCoinIcon.textContent = "BC";
+    coinAmount.style.fontSize = "28px";
+    coinAmount.style.fontWeight = "bold";
+    coinAmount.style.color = "hsl(210 40% 98%)"; // White text
+    const brainCoinIcon = document.createElement("i");
+    brainCoinIcon.className = "coin-icon bx bx-coin";
+    brainCoinIcon.style.color = "hsl(221.2 83.2% 53.3%)"; // Primary color from theme
     brainCoin.appendChild(coinAmount);
     brainCoin.appendChild(brainCoinIcon);
 
     // buy button
     const buyButton = document.createElement("button");
     buyButton.className = "buy";
-    buyButton.textContent = "buy";
+    buyButton.textContent = "BUY MORE COINS";
+    buyButton.style.padding = "10px 20px";
+    buyButton.style.fontSize = "18px";
+    buyButton.style.backgroundColor = "hsl(221.2 83.2% 53.3%)"; // Primary color from theme
+    buyButton.style.color = "white";
+    buyButton.style.border = "none";
+    buyButton.style.borderRadius = "5px";
+    buyButton.style.cursor = "pointer";
+    buyButton.style.margin = "15px auto 5px auto";
+    buyButton.style.display = "block";
     buyButton.onclick = function () {
       window.location.href = "http://localhost:3000";
     };
-
-    // profile button
-    const profile = document.createElement("div");
-    profile.className = "profile";
-    profile.onclick = function () {
-      window.location.href = "http://localhost:3000";
+    buyButton.onmouseover = function() {
+      this.style.backgroundColor = "hsl(224.3 76.3% 48%)"; // Ring color from theme (darker)
     };
-    const profileIcon = document.createElement("i");
-    profileIcon.className = "bx bxs-user";
-    profile.appendChild(profileIcon);
+    buyButton.onmouseout = function() {
+      this.style.backgroundColor = "hsl(221.2 83.2% 53.3%)"; // Primary color from theme
+    };
 
-    right.appendChild(timeLeft);
-    right.appendChild(brainCoin);
-    right.appendChild(buyButton);
-    right.appendChild(profile);
-    topbar.appendChild(left);
-    topbar.appendChild(right);
+    // Create a single vertical stack for everything
+    const stackContainer = document.createElement("div");
+    stackContainer.style.display = "flex";
+    stackContainer.style.flexDirection = "column";
+    stackContainer.style.alignItems = "center";
+    stackContainer.style.gap = "10px";
+    
+    // Label for coins
+    const coinsLabel = document.createElement("p");
+    coinsLabel.textContent = "Coins:";
+    coinsLabel.style.fontWeight = "bold";
+    coinsLabel.style.margin = "15px 0 0 0";
+    coinsLabel.style.color = "hsl(210 40% 98%)"; // White text
+    
+    // Container for coins
+    const coinsContainer = document.createElement("div");
+    coinsContainer.style.display = "flex";
+    coinsContainer.style.justifyContent = "center";
+    coinsContainer.style.alignItems = "center";
+    coinsContainer.style.margin = "0";
+    coinsContainer.appendChild(brainCoin);
+    
+    // Label for time
+    const timeLabel = document.createElement("p");
+    timeLabel.textContent = "Time Remaining:";
+    timeLabel.style.fontWeight = "bold";
+    timeLabel.style.margin = "10px 0 0 0";
+    timeLabel.style.color = "hsl(210 40% 98%)"; // White text
+    
+    // Container for time
+    const timeContainer = document.createElement("div");
+    timeContainer.style.display = "flex";
+    timeContainer.style.justifyContent = "center";
+    timeContainer.style.alignItems = "center";
+    timeContainer.style.margin = "0";
+    timeContainer.appendChild(timeLeft);
+    
+    // Spacing before button
+    const spacer = document.createElement("div");
+    spacer.style.height = "15px";
+    
+    stackContainer.appendChild(coinsLabel);
+    stackContainer.appendChild(coinsContainer);
+    stackContainer.appendChild(timeLabel);
+    stackContainer.appendChild(timeContainer);
+    stackContainer.appendChild(spacer);
+    stackContainer.appendChild(buyButton);
+    
+    controls.appendChild(stackContainer);
+    topbar.appendChild(title);
+    topbar.appendChild(controls);
 
     // Create the main content
     const main = document.createElement("div");
     main.className = "main";
-
-    // question
-    const question = document.createElement("p");
-    question.className = "question";
-    question.textContent = "Which of the following are true?";
-    const answers = document.createElement("p");
-    answers.className = "answers";
-
-    // answers
-    const answerA = document.createElement("p");
-    answerA.className = "answer";
-    answerA.textContent = "a. NP = P";
-    const answerB = document.createElement("p");
-    answerB.className = "answer";
-    answerB.textContent = "b. CFL require a CFG";
-    const answerC = document.createElement("p");
-    answerC.className = "answer";
-    answerC.textContent = "c. a RL can be encoded on a TM";
-    const answerD = document.createElement("p");
-    answerD.className = "answer";
-    answerD.textContent = "d. all RL are decidable";
-
-    answers.appendChild(answerA);
-    answers.appendChild(answerB);
-    answers.appendChild(answerC);
-    answers.appendChild(answerD);
-    main.appendChild(question);
-    main.appendChild(answers);
-
-    // Create the bottom buttons
-    const bottom = document.createElement("div");
-    bottom.className = "bottom";
-
-    // visit website button
-    const visitWebsiteButton = document.createElement("button");
-    visitWebsiteButton.className = "visit-website";
-    visitWebsiteButton.textContent = "Visit Website";
-    visitWebsiteButton.onclick = function () {
-      window.location.href = "http://localhost:3000";
-    };
-    const externalIcon = document.createElement("i");
-    externalIcon.className = "bx bx-link-external";
-    visitWebsiteButton.appendChild(externalIcon);
-
-    // next button
-    const nextButton = document.createElement("button");
-    nextButton.className = "next";
-    nextButton.textContent = "Next";
-
-    bottom.appendChild(visitWebsiteButton);
-    bottom.appendChild(nextButton);
+    
+    // Visit website link in main area
+    const mainVisitLink = document.createElement("a");
+    mainVisitLink.href = "http://localhost:3000";
+    mainVisitLink.textContent = "Visit Website";
+    mainVisitLink.style.textAlign = "center";
+    mainVisitLink.style.display = "block";
+    mainVisitLink.style.margin = "20px auto";
+    mainVisitLink.style.fontSize = "28px";
+    mainVisitLink.style.textDecoration = "none";
+    mainVisitLink.style.color = "hsl(217.2 91.2% 59.8%)"; // Primary color (brighter blue) from dark theme
+    
+    const linkIcon = document.createElement("i");
+    linkIcon.className = "bx bx-link-external";
+    linkIcon.style.marginLeft = "10px";
+    mainVisitLink.appendChild(linkIcon);
+    
+    main.appendChild(mainVisitLink);
 
     // Add elements to popup
     brbBody.appendChild(topbar);
     brbBody.appendChild(main);
-    brbBody.appendChild(bottom);
     popup.appendChild(brbBody);
 
     // Add the popup (everything) to the body
@@ -358,13 +423,13 @@ function mainFunction() {
   if (secondsLeft == 0) {
     video.pause();
     console.log("Video paused");
-    showPopup();
+    showPopup().catch(err => console.error("Error showing popup:", err));
   }
 
   // debug
   video.pause();
   console.log("Video paused");
-  showPopup();
+  showPopup().catch(err => console.error("Error showing popup:", err));
 }
 
 setTimeout(mainFunction, 2000); // Delay of 2000 milliseconds (2 seconds)

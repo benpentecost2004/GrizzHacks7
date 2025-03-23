@@ -242,16 +242,18 @@ def answer_check(request):
         data = request.get_json()  # Extract JSON data
         question = data.get("question")  # Get question from JSON
         answer_input = data.get("answer")  # Get answer from JSON
+        print("question: ", question)
+        print("answer: ", answer_input)
 
         if not question or not answer_input:
             return jsonify({"error": "Missing question or answer"}), 400
 
-        prompt = "Check this question to the answer and return True or False on whether it is correct"
+        prompt = "Does the answer correctly answer the question. Return true if yes and false if no. Only respond with true or false nothing else. If it is a math question make sure to turn the answer into a number"
         string = f"Question: {question} Answer: {answer_input}"
         
         response = generate_response(string, prompt)
         
-        return jsonify({"result": response.text})  # Return response in JSON format
+        return jsonify({"result": response})  # Return response in JSON format
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

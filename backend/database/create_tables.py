@@ -13,9 +13,13 @@ create_tables_query = """
     CREATE TABLE IF NOT EXISTS study_qs (
         id SERIAL PRIMARY KEY,
         user_id INT NOT NULL,
+        difficulty int,
         tokens_for_completion INT NOT NULL,
         question TEXT,
+        subject varchar(50),
         question_complete BOOLEAN,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id)
     );
   """

@@ -4,8 +4,9 @@ import traceback
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask import jsonify, request
+from db import get_db_connection
 from database.queries import fetch_user_by_email
-
+from werkzeug.security import generate_password_hash
 
 load_dotenv()
 def login_user(request):
@@ -71,3 +72,56 @@ def get_jwt_token(request):
 def get_user_id(request):
     user_id = get_jwt_token(request)
     return user_id
+
+
+def user_register(request):
+    try:
+        data = request.get_json()
+        print("Received data:", data)
+
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        email = data.get('email')
+        password = data.get('password')
+
+        if not first_name or not last_name or not email or not password:
+            return jsonify({"message": "First name, last name, email, and password are required!"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if email already exists
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        existing_user = cursor.fetchone()
+        if existing_user:
+            return jsonify({"message": "Email already taken!"}), 400
+
+        # Hash the password
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+        # Default brain_coins value (assumed to start at 0)
+        brain_coins = 0  
+
+        # Insert new user
+        cursor.execute(
+            """
+            INSERT INTO users (first_name, last_name, email, password, brain_coins, role) 
+            VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
+            """,
+            (first_name, last_name, email, hashed_password, brain_coins, 1)
+        )
+        user_id = cursor.fetchone()[0]  
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "User registered successfully!", "user_id": user_id}), 201
+
+    except Exception as e:
+        print(f"Error during registration: {e}")
+        print(traceback.format_exc())
+        return jsonify({"message": "Internal server error"}), 500

@@ -27,11 +27,11 @@ def get_user():
     return get_user_id(request)
 
 @app.route('/add_coins', methods=['POST'])
-def add_coints():
+def add_coins():
     return add_remove_braincoins_to_user(request, "add")
 
 @app.route('/remove_coins', methods=['POST'])
-def remove_coints():
+def remove_coins():
     return add_remove_braincoins_to_user(request, "remove")
 
 @app.route('/get_coins', methods=['GET'])

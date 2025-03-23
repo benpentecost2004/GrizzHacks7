@@ -3,22 +3,28 @@
   "name": "Brain Rot Blocker",
   "version": "1.0",
   "description": "Blurs YouTube when opened plus popup.",
-  "background": {
-    "service_worker": "background.js"
-  },
+
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/*"],
-      "css": ["main-page.css"]
+      "css": ["main-page.css"],
+      "js": ["background-content.js"]
     }
   ],
   "permissions": ["activeTab", "scripting"],
   "action": {
+    "default_popup": "popup-port.html",
     "default_title": "Click me"
   },
   "web_accessible_resources": [
     {
-      "resources": ["popup.html"],
+      "resources": [
+        "background-content.js",
+        "background.js",
+        "functions-content.js",
+        "popup-content.js",
+        "the-popup.html"
+      ],
       "matches": ["<all_urls>"]
     }
   ]

@@ -32,7 +32,7 @@ def add_coins():
     return add_remove_braincoins_to_user(request, "add")
 
 @app.route('/remove_coins', methods=['POST'])
-def remove_coints():
+def remove_coins():
     return add_remove_braincoins_to_user(request, "remove")
 
 @app.route('/get_coins', methods=['GET'])

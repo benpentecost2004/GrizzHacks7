@@ -4,13 +4,12 @@
 
 // Listen for the extension icon to be clicked
 chrome.action.onClicked.addListener((tab) => {
-  // Get the current tab ID
   const tabId = tab.id;
+  console.log(`Clicked on the icon in tab ${tabId}`);
 
-  // Inject the content script into the current tab
   chrome.scripting.executeScript({
     target: { tabId: tabId },
-    files: ["content2.js"],
+    files: ["background-content.js"],
     world: "MAIN",
   });
 

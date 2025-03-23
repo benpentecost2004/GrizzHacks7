@@ -501,6 +501,12 @@ function mainFunction() {
         secondsWatched += elapsedSeconds;
         accumulatedSeconds += elapsedSeconds;
         timeA = timeB;
+
+        if (diddyCoins == 0) {
+          video.pause();
+          console.log("Video paused - out of time");
+          showPopup().catch(err => console.error("Error showing popup:", err));
+        }
         
         // Every 60 seconds (1 minute) of watching, consume 1 minute of time
         if (accumulatedSeconds >= 60) {

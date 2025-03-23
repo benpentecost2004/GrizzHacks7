@@ -57,6 +57,11 @@ def get_subjects_by_user():
 @app.route('/file_to_gemini', methods=['POST'])
 def get_gemini_qs():
     return get_gem_qs(request)
+
+@app.route('/check_answer', methods=['POST'])
+def check_answer():
+    return answer_check(request)
+
 if __name__ == '__main__':
     app.run(debug=True)
 

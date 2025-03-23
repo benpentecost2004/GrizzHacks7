@@ -223,4 +223,13 @@ def get_gem_qs(request):
     except Exception as e:
         return jsonify({'error': f'Error processing file: {str(e)}'}), 500
 
+def answer_check(request):
+    question = request.question
+    answer_input = request.answer
+    prompt = "Check this question to the answer and return True or False on whether it is correct"
+    string = (f"Question: {question} Answer: {answer_input}")
+    response = generate_response(string, prompt)
+    return response.text
 
+    
+    

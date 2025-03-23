@@ -14,8 +14,7 @@
   ],
   "permissions": ["activeTab", "scripting"],
   "action": {
-    "default_title": "Click me",
-    "default_popup": "popup1.html"
+    "default_title": "Click me"
   },
   "web_accessible_resources": [
     {

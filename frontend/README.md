@@ -34,3 +34,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+
+
+Ben Braniff stuff:
+
+commands I ran in the frontend folder:
+cd frontend
+        (from ~/Documents/GitHub/GrizzHacks7/ to ~/Documents/GitHub/GrizzHacks7/frontend)
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+source /Users/benbraniff/.zshrc
+pnpm install
+    (^^ in order to get pnpm ^^)
+pnpm run dev
+    ( Local:   http://localhost:3000
+      Network: http://35.50.27.200:3000 )

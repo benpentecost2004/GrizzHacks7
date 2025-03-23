@@ -1,3 +1,5 @@
+// directly from the repo from iamOmarFaruk
+
 // Content script for Hello World Extension
 
 (function () {
@@ -11,9 +13,12 @@
     styles: `
             .hello-world-popup {
                 position: fixed;
-                top: 10px;
-                right: 20px;
-                background-color: #ffffff;
+                top: 0px;
+                right: 0px;
+                height: 100vh;
+                width: 100vw;
+                justify-content: center;
+                background-color: rgba(0, 0, 0, .5);
                 color: #333333;
                 padding: 15px 25px;
                 border-radius: 20px;

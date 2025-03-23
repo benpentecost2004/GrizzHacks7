@@ -1,7 +1,7 @@
 // variables
 let secondsLeft = parseInt(localStorage.getItem("secondsLeft")) || 1200; // 20min
 let secondsWatched = parseInt(localStorage.getItem("secondsWatched")) || 0;
-let BrainCoinsAmount = parseInt(localStorage.getItem("CoinsAmount")) || 0;
+let BrainAuraAmount = parseInt(localStorage.getItem("AuraAmount")) || 0;
 let video = document.querySelector("video");
 let minutesLeft = Math.ceil(secondsLeft / 60);
 let minutesWatched = Math.ceil(secondsWatched / 60);
@@ -20,21 +20,21 @@ export async function fetchCoinsFromAPI() {
     const data = await response.json();
     console.log("API response:", data);
     
-    BrainCoinsAmount = data.brain_coins || 0;
-    console.log("Updated CoinsAmount to:", BrainCoinsAmount);
-    localStorage.setItem("CoinsAmount", BrainCoinsAmount);
+    BrainAuraAmount = data.brain_coins || 0;
+    console.log("Updated AuraAmount to:", BrainAuraAmount);
+    localStorage.setItem("AuraAmount", BrainAuraAmount);
     
     // Update the display if popup already exists
-    const coinAmountElement = document.querySelector(".coin-amount");
-    if (coinAmountElement) {
-      coinAmountElement.textContent = BrainCoinsAmount;
-      console.log("Updated coin display to:", BrainCoinsAmount);
+    const auraAmountElement = document.querySelector(".aura-amount");
+    if (auraAmountElement) {
+      auraAmountElement.textContent = BrainAuraAmount;
+      console.log("Updated aura display to:", BrainAuraAmount);
     }
     
-    return BrainCoinsAmount;
+    return BrainAuraAmount;
   } catch (error) {
-    console.error('Error fetching coins:', error);
-    return BrainCoinsAmount;
+    console.error('Error fetching aura:', error);
+    return BrainAuraAmount;
   }
 }
 
@@ -127,7 +127,7 @@ export async function showPopup() {
       }
 
       .time-amount,
-      .coin-amount,
+      .aura-amount,
       .min {
         height: 33px;
         text-align: center;
@@ -135,7 +135,7 @@ export async function showPopup() {
         vertical-align: center;
       }
 
-      .coin,
+      .aura,
       .time-left {
         display: flex;
         flex-direction: row;
@@ -144,7 +144,7 @@ export async function showPopup() {
         margin: auto 0;
       }
 
-      .coin-icon {
+      .aura-icon {
         text-align: center;
         line-height: 20px;
         margin: auto 0;
@@ -315,26 +315,26 @@ export async function showPopup() {
   timeLeft.appendChild(timeAmount);
   timeLeft.appendChild(min);
 
-  // coins
+  // aura
   const brainCoin = document.createElement("div");
-  brainCoin.className = "coin";
-  const coinAmount = document.createElement("p");
-  coinAmount.className = "coin-amount";
-  coinAmount.textContent = BrainCoinsAmount; // This will now use the fetched amount
-  coinAmount.id = "coins-display"; // Add ID for easier updating
-  coinAmount.style.fontSize = "28px";
-  coinAmount.style.fontWeight = "bold";
-  coinAmount.style.color = "hsl(210 40% 98%)"; // White text
-  const brainCoinIcon = document.createElement("i");
-  brainCoinIcon.className = "coin-icon bx bx-coin";
-  brainCoinIcon.style.color = "hsl(221.2 83.2% 53.3%)"; // Primary color from theme
-  brainCoin.appendChild(coinAmount);
-  brainCoin.appendChild(brainCoinIcon);
+  brainCoin.className = "aura";
+  const auraAmount = document.createElement("p");
+  auraAmount.className = "aura-amount";
+  auraAmount.textContent = BrainAuraAmount; // This will now use the fetched amount
+  auraAmount.id = "aura-display"; // Add ID for easier updating
+  auraAmount.style.fontSize = "28px";
+  auraAmount.style.fontWeight = "bold";
+  auraAmount.style.color = "hsl(210 40% 98%)"; // White text
+  const brainAuraIcon = document.createElement("i");
+  brainAuraIcon.className = "aura-icon bx bx-brain";
+  brainAuraIcon.style.color = "hsl(221.2 83.2% 53.3%)"; // Primary color from theme
+  brainCoin.appendChild(auraAmount);
+  brainCoin.appendChild(brainAuraIcon);
 
   // buy button
   const buyButton = document.createElement("button");
   buyButton.className = "buy";
-  buyButton.textContent = "BUY MORE COINS";
+  buyButton.textContent = "BUY MORE TIME";
   buyButton.style.padding = "10px 20px";
   buyButton.style.fontSize = "18px";
   buyButton.style.backgroundColor = "hsl(221.2 83.2% 53.3%)"; // Primary color from theme
@@ -344,8 +344,56 @@ export async function showPopup() {
   buyButton.style.cursor = "pointer";
   buyButton.style.margin = "15px auto 5px auto";
   buyButton.style.display = "block";
-  buyButton.onclick = function () {
-    window.location.href = "http://localhost:3000";
+  buyButton.onclick = async function () {
+    try {
+      // Make POST request to remove coins
+      const response = await fetch("http://127.0.0.1:5000/remove_coins", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          amount: 100
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to purchase time");
+      }
+      
+      const data = await response.json();
+      console.log("Purchase response:", data);
+      
+      // Log full response for debugging
+      console.log("Full response data:", JSON.stringify(data));
+      
+      // If local BrainAuraAmount is at least 100, proceed with purchase
+      if (BrainAuraAmount >= 100) {
+        // Subtract coins
+        BrainAuraAmount = Math.max(0, BrainAuraAmount - 100);
+        
+        // Add time (1 minute = 60 seconds)
+        secondsLeft += 60;
+        
+        // Update localStorage
+        localStorage.setItem("AuraAmount", BrainAuraAmount);
+        localStorage.setItem("secondsLeft", secondsLeft);
+        
+        // Update display if element exists
+        const auraAmountElement = document.querySelector(".aura-amount");
+        if (auraAmountElement) {
+          auraAmountElement.textContent = BrainAuraAmount;
+        }
+        
+        // Show confirmation
+        alert("Successfully purchased 1 minute of time!");
+      } else {
+        alert("Not enough aura to make this purchase! You need 100 aura, but have " + BrainAuraAmount);
+      }
+    } catch (error) {
+      console.error("Error purchasing time:", error);
+      alert("Error purchasing time. Please try again later.");
+    }
   };
   buyButton.onmouseover = function() {
     this.style.backgroundColor = "hsl(224.3 76.3% 48%)"; // Ring color from theme (darker)
@@ -361,19 +409,19 @@ export async function showPopup() {
   stackContainer.style.alignItems = "center";
   stackContainer.style.gap = "10px";
   
-  // Label for coins
-  const coinsLabel = document.createElement("p");
-  coinsLabel.textContent = "Coins:";
-  coinsLabel.style.fontWeight = "bold";
-  coinsLabel.style.margin = "15px 0 0 0";
+  // Label for aura
+  const auraLabel = document.createElement("p");
+  auraLabel.textContent = "Aura:";
+  auraLabel.style.fontWeight = "bold";
+  auraLabel.style.margin = "15px 0 0 0";
   
-  // Container for coins
-  const coinsContainer = document.createElement("div");
-  coinsContainer.style.display = "flex";
-  coinsContainer.style.justifyContent = "center";
-  coinsContainer.style.alignItems = "center";
-  coinsContainer.style.margin = "0";
-  coinsContainer.appendChild(brainCoin);
+  // Container for aura
+  const auraContainer = document.createElement("div");
+  auraContainer.style.display = "flex";
+  auraContainer.style.justifyContent = "center";
+  auraContainer.style.alignItems = "center";
+  auraContainer.style.margin = "0";
+  auraContainer.appendChild(brainCoin);
   
   // Label for time
   const timeLabel = document.createElement("p");
@@ -393,8 +441,8 @@ export async function showPopup() {
   const spacer = document.createElement("div");
   spacer.style.height = "15px";
   
-  stackContainer.appendChild(coinsLabel);
-  stackContainer.appendChild(coinsContainer);
+  stackContainer.appendChild(auraLabel);
+  stackContainer.appendChild(auraContainer);
   stackContainer.appendChild(timeLabel);
   stackContainer.appendChild(timeContainer);
   stackContainer.appendChild(spacer);
@@ -410,8 +458,8 @@ export async function showPopup() {
   
   // Visit website link in main area
   const mainVisitLink = document.createElement("a");
-  mainVisitLink.href = "http://localhost:3000";
-  mainVisitLink.textContent = "Visit Website";
+  mainVisitLink.href = "https://brain-rot-blocker-web-t5i2-git-main-travisboyd884s-projects.vercel.app/dashboard";
+  mainVisitLink.textContent = "Earn More Aura";
   mainVisitLink.style.textAlign = "center";
   mainVisitLink.style.display = "block";
   mainVisitLink.style.margin = "20px auto";
